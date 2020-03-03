@@ -7,11 +7,15 @@ import com.aleksander.test.report.domain.response.QueryResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,12 +39,27 @@ public class StarWarsService {
     }
 
     public Map<URI, String> getFilmsByUris(Set<URI> uris) {
-        Set<FilmDto> films = new HashSet<>();
+        List<CompletableFuture<ResponseEntity<FilmDto>>> futuresList = new ArrayList<>();
+
         for(URI uri: uris) {
-            films.add(getObjectByURI(uri, FilmDto.class));
+            futuresList.add(getObjectByURI(uri, FilmDto.class));
         }
-        return films.stream()
-                .collect(Collectors.toMap(FilmDto::getUrl, FilmDto::getTitle));
+        // wait for all completed
+        futuresList.stream().map(CompletableFuture::join);
+
+        return getAllData(futuresList);
+    }
+
+    private FilmDto getFromComletableFuture(CompletableFuture<ResponseEntity<FilmDto>> cf) {
+        HttpStatus statusCode = HttpStatus.NOT_FOUND;
+        FilmDto dto = null;
+        try {
+            statusCode = cf.get().getStatusCode();
+            dto = cf.get().getBody();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return (statusCode == HttpStatus.OK) ? dto : null;
     }
 
     /**
@@ -50,8 +69,8 @@ public class StarWarsService {
      * @param <T>
      * @return object details mapped to given type
      */
-    private <T> T getObjectByURI(URI endpoint, Class<T> type) {
-        return apiConsumer.getResponse(endpoint.toString(), type);
+    private  <T> CompletableFuture<ResponseEntity<T>> getObjectByURI(URI endpoint, Class<T> type) {
+        return apiConsumer.getResponseAsync(endpoint.toString(), type);
     }
 
     /**
@@ -86,6 +105,22 @@ public class StarWarsService {
         return fromList.stream()
                 .map(ele -> objectMapper.convertValue(ele, type))
                 .collect(Collectors.toList());
+    }
+
+    private Map<URI, String> getAllData(List<CompletableFuture<ResponseEntity<FilmDto>>> futuresList) {
+        Map<URI, String> map = new HashMap<>();
+        for(CompletableFuture<ResponseEntity<FilmDto>> cf : futuresList) {
+            map.put(getKey(cf), getValue(cf));
+        }
+        return map;
+    }
+
+    private URI getKey(CompletableFuture<ResponseEntity<FilmDto>> cf) {
+        return Objects.requireNonNull(getFromComletableFuture(cf)).getUrl();
+    }
+
+    private String getValue(CompletableFuture<ResponseEntity<FilmDto>> cf) {
+        return Objects.requireNonNull(getFromComletableFuture(cf)).getTitle();
     }
 
     private String buildQueryUrl(String endpoint) {

@@ -20,23 +20,11 @@ public class SearchService {
 
     private final StarWarsService starWarsService;
 
-    private StopWatch watch = new StopWatch();
-
-
     public Set<ReportFilmEntry> findFilmsByCharacterAndHisHomeworld(GenerateReportCriteriaDto dto) {
-        StopWatch bigWatch = new StopWatch();
-        bigWatch.start();
-        log.info("Get planets start");
-        watch.start();
-        List<PlanetDto> planets = starWarsService.getPlanetsByPhrase(dto.getQueryCriteriaPlanetName());
-        watch.stop();
-        log.info("stop. Execution: " + watch.getTotalTimeMillis());
+        StopWatch watch = new StopWatch();
 
-        log.info("g planets start");
-        watch.start();
+        List<PlanetDto> planets = starWarsService.getPlanetsByPhrase(dto.getQueryCriteriaPlanetName());
         List<PersonDto> people = starWarsService.getPeopleByPhrase(dto.getQueryCriteriaCharacterPhrase());
-        watch.stop();
-        log.info("stop. Execution: " + watch.getTotalTimeMillis());
 
         List<PersonDto> peopleWithMatchingHomeworld = findPeopleWithHomeworldOnPlanets(people, planets);
 
@@ -45,9 +33,7 @@ public class SearchService {
         Set<URI> filmsToFetch = getDistinctFilmUris(peopleWithMatchingHomeworld);
         Map<URI, String> films = starWarsService.getFilmsByUris(filmsToFetch);
         watch.stop();
-        log.info("stop. Execution: " + watch.getTotalTimeMillis());
-        bigWatch.stop();
-        log.info("Whole ex time: " + watch.getTotalTimeSeconds());
+        log.info("ex time: " + watch.getTotalTimeSeconds());
 
         Set<ReportFilmEntry> result = new HashSet<>();
         for(PersonDto person : peopleWithMatchingHomeworld) {
