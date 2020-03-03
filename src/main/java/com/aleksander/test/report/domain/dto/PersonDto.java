@@ -1,9 +1,10 @@
-package com.aleksander.test.report.dto;
+package com.aleksander.test.report.domain.dto;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,7 +23,7 @@ import java.util.List;
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class Person {
+public class PersonDto {
 
     /**
      * The url of the planet resource that this person was born on.
@@ -55,5 +56,5 @@ public class Person {
      */
     @JsonProperty("films")
     @JsonPropertyDescription("An array of urls of film resources that this person has been in.")
-    public List<URI> films = null;
+    private List<URI> films = new ArrayList<>();
 }

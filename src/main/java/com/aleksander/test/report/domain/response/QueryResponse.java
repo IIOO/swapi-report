@@ -1,4 +1,4 @@
-package com.aleksander.test.report.dto.response;
+package com.aleksander.test.report.domain.response;
 
 import lombok.Data;
 

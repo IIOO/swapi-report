@@ -1,16 +1,16 @@
 package com.aleksander.test.report.service;
 
-import com.aleksander.test.report.dto.Person;
-import com.aleksander.test.report.dto.Planet;
-import com.aleksander.test.report.dto.response.QueryResponse;
+import com.aleksander.test.report.domain.dto.FilmDto;
+import com.aleksander.test.report.domain.dto.PersonDto;
+import com.aleksander.test.report.domain.dto.PlanetDto;
+import com.aleksander.test.report.domain.response.QueryResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.net.URI;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,19 +24,39 @@ public class StarWarsService {
     private final ObjectMapper objectMapper;
 
 
-    public List<Planet> getPlanetsByPhrase(String phrase) {
-        return getByPhrase(PLANETS_URL, phrase, Planet.class);
+    public List<PlanetDto> getPlanetsByPhrase(String phrase) {
+        return getByPhrase(PLANETS_URL, phrase, PlanetDto.class);
     }
 
-    public List<Person> getPeopleByPhrase(String phrase) {
-        return getByPhrase(PEOPLE_URL, phrase, Person.class);
+    public List<PersonDto> getPeopleByPhrase(String phrase) {
+        return getByPhrase(PEOPLE_URL, phrase, PersonDto.class);
+    }
+
+    public Map<URI, String> getFilmsByUris(Set<URI> uris) {
+        Set<FilmDto> films = new HashSet<>();
+        for(URI uri: uris) {
+            films.add(getObjectByURI(uri, FilmDto.class));
+        }
+        return films.stream()
+                .collect(Collectors.toMap(FilmDto::getUrl, FilmDto::getTitle));
+    }
+
+    /**
+     * Make get request to endpoint with object details
+     * @param endpoint full uri to resource
+     * @param type of object
+     * @param <T>
+     * @return object details mapped to given type
+     */
+    private <T> T getObjectByURI(URI endpoint, Class<T> type) {
+        return apiConsumer.getResponse(endpoint.toString(), type);
     }
 
     /**
      * Make get request to endpoint with search query based on phrase to fetch data from all pages
-     * @param endpoint
-     * @param phrase
-     * @param type of object to map
+     * @param endpoint full url
+     * @param phrase to build parameter query
+     * @param type of object to map (target type)
      * @param <T>
      * @return list of all objects matching given query phrase
      */
@@ -54,9 +74,9 @@ public class StarWarsService {
     }
 
     /**
-     * Map list containing LinkedHashMap<String, String> to object of given type
-     * @param fromList
-     * @param type
+     * Map list to object of given type
+     * @param fromList list of LinkedHashMap<String, String> to process
+     * @param type of object to map (target type)
      * @param <T>
      * @return mapped list
      */

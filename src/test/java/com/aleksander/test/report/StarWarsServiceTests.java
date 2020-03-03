@@ -1,13 +1,14 @@
 package com.aleksander.test.report;
 
-import com.aleksander.test.report.dto.Person;
-import com.aleksander.test.report.dto.Planet;
+import com.aleksander.test.report.domain.dto.PersonDto;
+import com.aleksander.test.report.domain.dto.PlanetDto;
 import com.aleksander.test.report.service.StarWarsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
+import java.net.URI;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,40 +20,56 @@ public class StarWarsServiceTests {
 //  PLANETS
     @Test
     void getPlanetsByPhraseSimple() {
-        List<Planet> planets = starWarsService.getPlanetsByPhrase("Tatooine");
-        assertEquals(1, planets.size());
-        assertEquals("Tatooine", planets.get(0).getName());
+        List<PlanetDto> planetDtos = starWarsService.getPlanetsByPhrase("Tatooine");
+        assertEquals(1, planetDtos.size());
+        assertEquals("Tatooine", planetDtos.get(0).getName());
     }
 
     @Test
     void getPlanetsByPhraseManyPages() {
-        List<Planet> planets = starWarsService.getPlanetsByPhrase("a");
-        assertEquals(40, planets.size());
+        List<PlanetDto> planetDtos = starWarsService.getPlanetsByPhrase("a");
+        assertEquals(40, planetDtos.size());
     }
 
     @Test
     void getPlanetsByPhraseNotExisting() {
-        List<Planet> planet = starWarsService.getPlanetsByPhrase("pluton");
-        assertEquals(0, planet.size());
+        List<PlanetDto> planetDto = starWarsService.getPlanetsByPhrase("pluton");
+        assertEquals(0, planetDto.size());
     }
 
 //  PEOPLE
     @Test
     void getPeopleByPhraseSimple() {
-        List<Person> people = starWarsService.getPeopleByPhrase("Luke");
+        List<PersonDto> people = starWarsService.getPeopleByPhrase("Luke");
         assertEquals(1, people.size());
         assertEquals("Luke Skywalker", people.get(0).getName());
     }
 
     @Test
     void getPeopleByPhraseManyPages() {
-        List<Person> people = starWarsService.getPeopleByPhrase("an");
+        List<PersonDto> people = starWarsService.getPeopleByPhrase("an");
         assertEquals(12, people.size());
     }
 
     @Test
     void getPeopleByPhraseNotExisting() {
-        List<Person> people = starWarsService.getPeopleByPhrase("joda");
+        List<PersonDto> people = starWarsService.getPeopleByPhrase("joda");
         assertEquals(0, people.size());
+    }
+
+//   FILMS
+    @Test
+    void getFilmsByUri() {
+        URI uri1 = URI.create("https://swapi.co/api/films/2/");
+        URI uri2 = URI.create("https://swapi.co/api/films/6/");
+        URI uri3 = URI.create("https://swapi.co/api/films/3/");
+        Set<URI> uriSet = new HashSet<>(Arrays.asList(uri1, uri2, uri3));
+
+        Map<URI, String> films = starWarsService.getFilmsByUris(uriSet);
+
+        assertEquals(3, films.size());
+        assertEquals("The Empire Strikes Back", films.get(uri1));
+        assertEquals("Revenge of the Sith", films.get(uri2));
+        assertEquals("Return of the Jedi", films.get(uri3));
     }
 }
