@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class StarWarsService {
     private final static String PLANETS_URL = "https://swapi.co/api/planets/";

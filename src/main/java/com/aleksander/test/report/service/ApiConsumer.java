@@ -1,8 +1,8 @@
 package com.aleksander.test.report.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
 public class ApiConsumer {
     private final RestTemplate restTemplate;
@@ -24,7 +23,6 @@ public class ApiConsumer {
 
     @Async("asyncExecutor")
     protected <T> CompletableFuture<ResponseEntity<T>> getResponseAsync(String url, Class<T> type) {
-        log.info("Request: " + url);
         return CompletableFuture.completedFuture(restTemplate.getForEntity(url, type));
     }
 }

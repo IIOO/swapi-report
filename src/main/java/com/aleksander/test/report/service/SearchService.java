@@ -7,7 +7,6 @@ import com.aleksander.test.report.domain.dto.PlanetDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
 
 import java.net.URI;
 import java.util.*;
@@ -21,19 +20,13 @@ public class SearchService {
     private final StarWarsService starWarsService;
 
     public Set<ReportFilmEntry> findFilmsByCharacterAndHisHomeworld(GenerateReportCriteriaDto dto) {
-        StopWatch watch = new StopWatch();
-
         List<PlanetDto> planets = starWarsService.getPlanetsByPhrase(dto.getQueryCriteriaPlanetName());
         List<PersonDto> people = starWarsService.getPeopleByPhrase(dto.getQueryCriteriaCharacterPhrase());
 
         List<PersonDto> peopleWithMatchingHomeworld = findPeopleWithHomeworldOnPlanets(people, planets);
 
-        log.info("Get films");
-        watch.start();
         Set<URI> filmsToFetch = getDistinctFilmUris(peopleWithMatchingHomeworld);
         Map<URI, String> films = starWarsService.getFilmsByUris(filmsToFetch);
-        watch.stop();
-        log.info("ex time: " + watch.getTotalTimeSeconds());
 
         Set<ReportFilmEntry> result = new HashSet<>();
         for(PersonDto person : peopleWithMatchingHomeworld) {
