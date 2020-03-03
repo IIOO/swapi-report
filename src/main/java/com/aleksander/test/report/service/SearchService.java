@@ -5,27 +5,49 @@ import com.aleksander.test.report.domain.dto.GenerateReportCriteriaDto;
 import com.aleksander.test.report.domain.dto.PersonDto;
 import com.aleksander.test.report.domain.dto.PlanetDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SearchService {
 
     private final StarWarsService starWarsService;
 
+    private StopWatch watch = new StopWatch();
+
 
     public Set<ReportFilmEntry> findFilmsByCharacterAndHisHomeworld(GenerateReportCriteriaDto dto) {
+        StopWatch bigWatch = new StopWatch();
+        bigWatch.start();
+        log.info("Get planets start");
+        watch.start();
         List<PlanetDto> planets = starWarsService.getPlanetsByPhrase(dto.getQueryCriteriaPlanetName());
+        watch.stop();
+        log.info("stop. Execution: " + watch.getTotalTimeMillis());
+
+        log.info("g planets start");
+        watch.start();
         List<PersonDto> people = starWarsService.getPeopleByPhrase(dto.getQueryCriteriaCharacterPhrase());
+        watch.stop();
+        log.info("stop. Execution: " + watch.getTotalTimeMillis());
 
         List<PersonDto> peopleWithMatchingHomeworld = findPeopleWithHomeworldOnPlanets(people, planets);
 
+        log.info("Get films");
+        watch.start();
         Set<URI> filmsToFetch = getDistinctFilmUris(peopleWithMatchingHomeworld);
         Map<URI, String> films = starWarsService.getFilmsByUris(filmsToFetch);
+        watch.stop();
+        log.info("stop. Execution: " + watch.getTotalTimeMillis());
+        bigWatch.stop();
+        log.info("Whole ex time: " + watch.getTotalTimeSeconds());
 
         Set<ReportFilmEntry> result = new HashSet<>();
         for(PersonDto person : peopleWithMatchingHomeworld) {

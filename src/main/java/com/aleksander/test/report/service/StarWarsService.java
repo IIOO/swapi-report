@@ -6,6 +6,7 @@ import com.aleksander.test.report.domain.dto.PlanetDto;
 import com.aleksander.test.report.domain.response.QueryResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -14,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class StarWarsService {
     private final static String PLANETS_URL = "https://swapi.co/api/planets/";

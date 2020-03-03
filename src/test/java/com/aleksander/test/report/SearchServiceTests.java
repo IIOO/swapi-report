@@ -30,6 +30,7 @@ public class SearchServiceTests {
 
     @Test
     void getFilmsWhereCharacterWithGivenNameAndHomeworldPlanetAppeared() {
+//      Run
         Set<ReportFilmEntry> reportEntries = searchService.findFilmsByCharacterAndHisHomeworld(GenerateReportCriteriaDto.builder()
                 .queryCriteriaPlanetName("Alderaan")
                 .queryCriteriaCharacterPhrase("ana")
