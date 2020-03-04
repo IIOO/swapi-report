@@ -1,12 +1,11 @@
 package com.aleksander.test.report.service;
 
-import com.aleksander.test.report.domain.dto.FilmDto;
-import com.aleksander.test.report.domain.dto.PersonDto;
-import com.aleksander.test.report.domain.dto.PlanetDto;
-import com.aleksander.test.report.domain.response.QueryResponse;
+import com.aleksander.test.report.dto.response.FilmResponseDto;
+import com.aleksander.test.report.dto.response.PersonResponseDto;
+import com.aleksander.test.report.dto.response.PlanetResponseDto;
+import com.aleksander.test.report.dto.response.QueryResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,27 +20,27 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class StarWarsService {
-    private final static String PLANETS_URL = "https://swapi.co/api/planets/";
-    private final static String PEOPLE_URL = "https://swapi.co/api/people/";
+    public final static String PLANETS_URL = "https://swapi.co/api/planets/";
+    public final static String PEOPLE_URL = "https://swapi.co/api/people/";
 
     private final ApiConsumer apiConsumer;
 
     private final ObjectMapper objectMapper;
 
 
-    public List<PlanetDto> getPlanetsByPhrase(String phrase) {
-        return getByPhrase(PLANETS_URL, phrase, PlanetDto.class);
+    public List<PlanetResponseDto> getPlanetsByPhrase(String phrase) {
+        return getByPhrase(PLANETS_URL, phrase, PlanetResponseDto.class);
     }
 
-    public List<PersonDto> getPeopleByPhrase(String phrase) {
-        return getByPhrase(PEOPLE_URL, phrase, PersonDto.class);
+    public List<PersonResponseDto> getPeopleByPhrase(String phrase) {
+        return getByPhrase(PEOPLE_URL, phrase, PersonResponseDto.class);
     }
 
     public Map<URI, String> getFilmsByUris(Set<URI> uris) {
-        List<CompletableFuture<ResponseEntity<FilmDto>>> futuresList = new ArrayList<>();
+        List<CompletableFuture<ResponseEntity<FilmResponseDto>>> futuresList = new ArrayList<>();
 
         for(URI uri: uris) {
-            futuresList.add(getObjectByURI(uri, FilmDto.class));
+            futuresList.add(getObjectByURI(uri, FilmResponseDto.class));
         }
         // wait for all completed
         futuresList.stream().map(CompletableFuture::join);
@@ -49,9 +48,9 @@ public class StarWarsService {
         return getAllData(futuresList);
     }
 
-    private FilmDto getFromComletableFuture(CompletableFuture<ResponseEntity<FilmDto>> cf) {
+    private FilmResponseDto getDataFromComletableFuture(CompletableFuture<ResponseEntity<FilmResponseDto>> cf) {
         HttpStatus statusCode = HttpStatus.NOT_FOUND;
-        FilmDto dto = null;
+        FilmResponseDto dto = null;
         try {
             statusCode = cf.get().getStatusCode();
             dto = cf.get().getBody();
@@ -94,7 +93,7 @@ public class StarWarsService {
     }
 
     /**
-     * Map list to object of given type
+     * Map list to objects of given type
      * @param fromList list of LinkedHashMap<String, String> to process
      * @param type of object to map (target type)
      * @param <T>
@@ -106,20 +105,20 @@ public class StarWarsService {
                 .collect(Collectors.toList());
     }
 
-    private Map<URI, String> getAllData(List<CompletableFuture<ResponseEntity<FilmDto>>> futuresList) {
+    private Map<URI, String> getAllData(List<CompletableFuture<ResponseEntity<FilmResponseDto>>> futuresList) {
         Map<URI, String> map = new HashMap<>();
-        for(CompletableFuture<ResponseEntity<FilmDto>> cf : futuresList) {
+        for(CompletableFuture<ResponseEntity<FilmResponseDto>> cf : futuresList) {
             map.put(getKey(cf), getValue(cf));
         }
         return map;
     }
 
-    private URI getKey(CompletableFuture<ResponseEntity<FilmDto>> cf) {
-        return Objects.requireNonNull(getFromComletableFuture(cf)).getUrl();
+    private URI getKey(CompletableFuture<ResponseEntity<FilmResponseDto>> cf) {
+        return Objects.requireNonNull(getDataFromComletableFuture(cf)).getUrl();
     }
 
-    private String getValue(CompletableFuture<ResponseEntity<FilmDto>> cf) {
-        return Objects.requireNonNull(getFromComletableFuture(cf)).getTitle();
+    private String getValue(CompletableFuture<ResponseEntity<FilmResponseDto>> cf) {
+        return Objects.requireNonNull(getDataFromComletableFuture(cf)).getTitle();
     }
 
     private String buildQueryUrl(String endpoint) {

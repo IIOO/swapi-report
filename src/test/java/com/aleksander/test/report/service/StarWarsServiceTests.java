@@ -30,6 +30,7 @@ public class StarWarsServiceTests {
     @Test
     void getPlanetsByPhraseSimple() {
         List<PlanetResponseDto> planetDtos = starWarsService.getPlanetsByPhrase("Tatooine");
+
         assertEquals(1, planetDtos.size());
         assertEquals("Tatooine", planetDtos.get(0).getName());
     }
@@ -37,12 +38,14 @@ public class StarWarsServiceTests {
     @Test
     void getPlanetsByPhraseManyPages() {
         List<PlanetResponseDto> planetDtos = starWarsService.getPlanetsByPhrase("a");
+
         assertEquals(40, planetDtos.size());
     }
 
     @Test
     void getPlanetsByPhraseNotExisting() {
         List<PlanetResponseDto> planetDto = starWarsService.getPlanetsByPhrase("pluton");
+
         assertEquals(0, planetDto.size());
     }
 
@@ -50,6 +53,7 @@ public class StarWarsServiceTests {
     @Test
     void getPeopleByPhraseSimple() {
         List<PersonResponseDto> people = starWarsService.getPeopleByPhrase("Luke");
+
         assertEquals(1, people.size());
         assertEquals("Luke Skywalker", people.get(0).getName());
     }
@@ -57,12 +61,14 @@ public class StarWarsServiceTests {
     @Test
     void getPeopleByPhraseManyPages() {
         List<PersonResponseDto> people = starWarsService.getPeopleByPhrase("an");
+
         assertEquals(12, people.size());
     }
 
     @Test
     void getPeopleByPhraseNotExisting() {
         List<PersonResponseDto> people = starWarsService.getPeopleByPhrase("joda");
+
         assertEquals(0, people.size());
     }
 
