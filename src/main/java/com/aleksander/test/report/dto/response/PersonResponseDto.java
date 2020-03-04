@@ -1,6 +1,7 @@
-package com.aleksander.test.report.domain.dto;
+package com.aleksander.test.report.dto.response;
 
 import com.fasterxml.jackson.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.net.URI;
@@ -23,7 +24,8 @@ import java.util.List;
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class PersonDto {
+@AllArgsConstructor
+public class PersonResponseDto {
 
     /**
      * The url of the planet resource that this person was born on.

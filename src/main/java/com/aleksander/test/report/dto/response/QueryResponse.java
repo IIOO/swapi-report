@@ -1,11 +1,11 @@
-package com.aleksander.test.report.domain.response;
+package com.aleksander.test.report.dto.response;
 
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
 public class QueryResponse {
     private String next;
     private List<Object> results;

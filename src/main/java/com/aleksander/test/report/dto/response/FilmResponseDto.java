@@ -1,4 +1,4 @@
-package com.aleksander.test.report.domain.dto;
+package com.aleksander.test.report.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +21,7 @@ import java.net.URI;
         "url",
 })
 @Data
-public class FilmDto {
+public class FilmResponseDto {
     /**
      * The title of this film.
      * (Required)

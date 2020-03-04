@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 public class ApiConsumer {
     private final RestTemplate restTemplate;
 
-    protected <T> T getResponse(String url,Class<T> type) {
+    protected <T> T getResponse(String url, Class<T> type) {
         ResponseEntity<T> response = restTemplate.getForEntity(url, type);
         HttpStatus statusCode = response.getStatusCode();
 //      Handle other http status?

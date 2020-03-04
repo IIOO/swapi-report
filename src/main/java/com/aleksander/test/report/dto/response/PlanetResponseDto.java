@@ -1,6 +1,7 @@
-package com.aleksander.test.report.domain.dto;
+package com.aleksander.test.report.dto.response;
 
 import com.fasterxml.jackson.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.net.URI;
@@ -19,7 +20,8 @@ import java.net.URI;
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class PlanetDto {
+@AllArgsConstructor
+public class PlanetResponseDto {
     /**
      * The hypermedia URL of this resource.
      * (Required)

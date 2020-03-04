@@ -1,11 +1,13 @@
-package com.aleksander.test.report.domain;
+package com.aleksander.test.report.dto;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 @Builder
+@Getter
 @EqualsAndHashCode
-public class ReportFilmEntry {
+public class FilmEntryDto {
     private int filmId;
     private String filmName;
     private int characterId;

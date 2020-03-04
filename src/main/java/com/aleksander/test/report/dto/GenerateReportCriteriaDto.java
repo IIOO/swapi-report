@@ -1,4 +1,4 @@
-package com.aleksander.test.report.domain.dto;
+package com.aleksander.test.report.dto;
 
 import lombok.Builder;
 import lombok.Getter;
