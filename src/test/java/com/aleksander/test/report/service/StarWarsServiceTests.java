@@ -3,6 +3,7 @@ package com.aleksander.test.report.service;
 import com.aleksander.test.report.dto.response.PersonResponseDto;
 import com.aleksander.test.report.dto.response.PlanetResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
@@ -21,7 +22,7 @@ public class StarWarsServiceTests {
     static void setUp() {
         //mock api consumer
         ApiConsumer apiConsumer = new ApiConsumer(new RestTemplate());
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
         starWarsService = new StarWarsService(apiConsumer, objectMapper);
     }
 

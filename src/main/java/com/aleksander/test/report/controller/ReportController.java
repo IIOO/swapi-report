@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@Controller("/report")
+@Controller
+@RequestMapping("/report")
 @RequiredArgsConstructor
 public class ReportController {
     private final SearchService searchService;
