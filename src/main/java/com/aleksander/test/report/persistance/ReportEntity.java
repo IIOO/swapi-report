@@ -28,7 +28,7 @@ public class ReportEntity {
     @Length(max = 50)
     private String queryCriteriaPlanetName;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "result_id")
     private Set<FilmEntryEntity> result;
 

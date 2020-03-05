@@ -1,10 +1,13 @@
 package com.aleksander.test.report.dto;
 
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GenerateReportCriteriaDto {
     @JsonProperty("query_criteria_character_phrase")
     private String queryCriteriaCharacterPhrase;

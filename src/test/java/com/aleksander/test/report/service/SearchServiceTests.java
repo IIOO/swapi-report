@@ -37,12 +37,8 @@ public class SearchServiceTests {
     @MockitoSettings(strictness = Strictness.LENIENT)
     @Test
     void getFilmsWhereCharacterWithGivenNameAndHomeworldPlanetAppearedSimple() {
-//      given
-        GenerateReportCriteriaDto phrases = GenerateReportCriteriaDto.builder()
-                .queryCriteriaPlanetName("Tatooine")
-                .queryCriteriaCharacterPhrase("ana")
-                .build();
-
+        // given
+        GenerateReportCriteriaDto phrases = new GenerateReportCriteriaDto("ana","Tatooine");
         Mockito.when(starWarsService.getPeopleByPhrase(phrases.getQueryCriteriaCharacterPhrase()))
                 .thenReturn(buildPeopleListSimple());
         Mockito.when(starWarsService.getPlanetsByPhrase(phrases.getQueryCriteriaPlanetName()))
@@ -55,24 +51,18 @@ public class SearchServiceTests {
                 )))
         ).thenReturn(buildFilmsMapSimple());
 
-//      when
-        Set<FilmEntryDto> reportEntries = searchService.findFilmsByCharacterAndHisHomeworld(GenerateReportCriteriaDto.builder()
-                .queryCriteriaCharacterPhrase("ana")
-                .queryCriteriaPlanetName("Tatooine")
-                .build());
-//      then
+        // when
+        Set<FilmEntryDto> reportEntries = searchService.findFilmsByCharacterAndHisHomeworld(phrases);
+
+        // then
         assertEquals(3, reportEntries.size());
     }
 
     @MockitoSettings(strictness = Strictness.LENIENT)
     @Test
     void getFilmsWhereCharacterWithGivenNameAndHomeworldPlanetAppeared() {
-//      given
-        GenerateReportCriteriaDto phrases = GenerateReportCriteriaDto.builder()
-                .queryCriteriaPlanetName("Alderaan")
-                .queryCriteriaCharacterPhrase("ana")
-                .build();
-
+        // given
+        GenerateReportCriteriaDto phrases = new GenerateReportCriteriaDto("ana","Alderaan");
         Mockito.when(starWarsService.getPeopleByPhrase(phrases.getQueryCriteriaCharacterPhrase())).thenReturn(buildPeopleListSimple());
         Mockito.when(starWarsService.getPlanetsByPhrase(phrases.getQueryCriteriaPlanetName())).thenReturn(buildPlanetList());
         Mockito.when(starWarsService.getFilmsByUris(
@@ -86,10 +76,10 @@ public class SearchServiceTests {
                 )))
         ).thenReturn(buildFilmsMap());
 
-//      when
+        // when
         Set<FilmEntryDto> reportEntries = searchService.findFilmsByCharacterAndHisHomeworld(phrases);
 
-//      then
+        // then
         assertEquals(7, reportEntries.size());
     }
 

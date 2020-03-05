@@ -20,14 +20,14 @@ public class StarWarsServiceAsyncTests {
 
     @Test
     void getFilmsByUriAsync() {
-//      given
+        // given
         URI uri1 = URI.create("https://swapi.co/api/films/2/");
         URI uri2 = URI.create("https://swapi.co/api/films/6/");
         URI uri3 = URI.create("https://swapi.co/api/films/3/");
         Set<URI> uriSet = new HashSet<>(Arrays.asList(uri1, uri2, uri3));
-//      when
+        // when
         Map<URI, String> films = starWarsService.getFilmsByUris(uriSet);
-//      then
+        // then
         assertEquals(3, films.size());
         assertEquals("The Empire Strikes Back", films.get(uri1));
         assertEquals("Revenge of the Sith", films.get(uri2));
@@ -36,9 +36,9 @@ public class StarWarsServiceAsyncTests {
 
     @Test
     void getPlanetsByPhraseManyPagesAsync() {
-//      when
+        // when
         List<PlanetResponseDto> planetDtos = starWarsService.getPlanetsByPhrase("a");
-//      then
+        // then
         assertEquals(40, planetDtos.size());
     }
 }
