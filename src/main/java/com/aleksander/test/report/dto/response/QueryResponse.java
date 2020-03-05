@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 public class QueryResponse {
+    private Integer count;
     private String next;
     private List<Object> results;
 
