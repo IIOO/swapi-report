@@ -2,7 +2,10 @@ package com.aleksander.test.report.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -17,9 +20,7 @@ public class ApiConsumer {
 
     protected <T> T getResponse(String url, Class<T> type) {
         ResponseEntity<T> response = restTemplate.exchange(url, HttpMethod.GET, getHttpEntity(), type);
-        HttpStatus statusCode = response.getStatusCode();
-//      Handle other http status?
-        return (statusCode == HttpStatus.OK) ? response.getBody() : null;
+        return response.getBody();
     }
 
     @Async("asyncExecutor")

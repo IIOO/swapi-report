@@ -13,4 +13,9 @@ public class ExceptionHandlerController {
     public ResponseEntity<ExceptionDto> noReportWithGivenIdException() {
         return new ResponseEntity<>(new ExceptionDto("No report with given id"), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ExceptionDto> swapiException(ExternalApiException ex) {
+        return new ResponseEntity<>(new ExceptionDto(ex.getMessage()), ex.getStatus());
+    }
 }

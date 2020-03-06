@@ -2,10 +2,11 @@ package com.aleksander.test.report.service;
 
 import com.aleksander.test.report.dto.response.PlanetResponseDto;
 import com.aleksander.test.report.dto.response.QueryResponse;
+import com.aleksander.test.report.exception.ExternalApiException;
+import com.aleksander.test.report.exception.RestTemplateResponseErrorHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +25,7 @@ public class ApiConsumerTests {
     @BeforeAll
     static void setUp() {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
         apiConsumer = new ApiConsumer(restTemplate);
     }
 
@@ -37,11 +39,11 @@ public class ApiConsumerTests {
 
     @Test
     void invalidUrl() {
-        HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> {
+        ExternalApiException exception = assertThrows(ExternalApiException.class, () -> {
             apiConsumer.getResponse(INVALID_URL, QueryResponse.class);
         });
 
-        assertEquals(404, exception.getRawStatusCode());
+        assertEquals(404, exception.getStatus().value());
     }
 
     @Test
