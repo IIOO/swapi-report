@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -31,25 +32,32 @@ public class ApiConsumerTests {
 
     @Test
     void getResponseWithNextPage() {
+        // when
         QueryResponse response = apiConsumer.getResponse(SEARCH_PLANETS_URL, QueryResponse.class);
+        String query = URI.create(response.getNext()).getQuery();
 
-        assertEquals(SEARCH_PLANETS_URL + "&page=2", response.getNext());
+        // then
         assertTrue(response.getResults().size() > 0);
+        assertTrue(query.contains("page=2"));
     }
 
     @Test
     void invalidUrl() {
+        // when
         ExternalApiException exception = assertThrows(ExternalApiException.class, () -> {
             apiConsumer.getResponse(INVALID_URL, QueryResponse.class);
         });
 
+        // then
         assertEquals(404, exception.getStatus().value());
     }
 
     @Test
     void getAsyncResponse() throws ExecutionException, InterruptedException {
+        // when
         CompletableFuture<ResponseEntity<PlanetResponseDto>> cf = apiConsumer.getResponseAsync(PLANET_URL, PlanetResponseDto.class);
 
+        // then
         assertEquals(PLANET_URL, cf.get().getBody().getUrl().toString());
     }
 }
