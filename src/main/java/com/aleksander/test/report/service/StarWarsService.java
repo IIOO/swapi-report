@@ -6,7 +6,7 @@ import com.aleksander.test.report.dto.response.PlanetResponseDto;
 import com.aleksander.test.report.dto.response.QueryResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -14,10 +14,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class StarWarsService {
     public final static String PLANETS_URL = "https://swapi.co/api/planets/";
@@ -47,10 +47,11 @@ public class StarWarsService {
         for(URI uri: uris) {
             futuresList.add(getObjectByURI(uri, FilmResponseDto.class));
         }
-        // wait for all completed
-        futuresList.stream().map(CompletableFuture::join);
-
-        return getAllFilmData(futuresList);
+        // wait for all completed and map results
+        return futuresList.stream()
+                .map(CompletableFuture::join)
+                .map(cf -> Objects.requireNonNull(cf.getBody()))
+                .collect(Collectors.toMap(FilmResponseDto::getUrl, FilmResponseDto::getTitle));
     }
 
     /**
@@ -73,10 +74,12 @@ public class StarWarsService {
      * @return list of all objects matching given query phrase
      */
     private <T> List<T> getByPhrase(String endpoint, String phrase, Class<T> type) {
-        List<T> list = new ArrayList<>();
         String url = buildQueryUrl(endpoint, phrase);
 
         QueryResponse response = apiConsumer.getResponse(url, QueryResponse.class);
+
+        // add all first page results
+        List<T> list = new ArrayList<>(mapToListOfObjectType(response.getResults(), type));
 
         if (Objects.nonNull(response.getNext())) {
              List<CompletableFuture<ResponseEntity<QueryResponse>>> futuresList = new ArrayList<>();
@@ -95,8 +98,6 @@ public class StarWarsService {
             // add all next pages results
             list.addAll(otherPagesResults);
         }
-            // add all first page results
-            list.addAll(mapToListOfObjectType(response.getResults(), type));
         return list;
     }
 
@@ -113,42 +114,10 @@ public class StarWarsService {
                 .collect(Collectors.toList());
     }
 
-    private <T> T getDataFromComletableFuture(CompletableFuture<ResponseEntity<T>> cf) {
-        HttpStatus statusCode = HttpStatus.NOT_FOUND;
-        T dto = null;
-        try {
-            statusCode = cf.get().getStatusCode();
-            dto = cf.get().getBody();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return (statusCode == HttpStatus.OK) ? dto : null;
-    }
-
-    private Map<URI, String> getAllFilmData(List<CompletableFuture<ResponseEntity<FilmResponseDto>>> futuresList) {
-        Map<URI, String> map = new HashMap<>();
-        for(CompletableFuture<ResponseEntity<FilmResponseDto>> cf : futuresList) {
-            map.put(getKey(cf), getValue(cf));
-        }
-        return map;
-    }
-
-    private URI getKey(CompletableFuture<ResponseEntity<FilmResponseDto>> cf) {
-        return Objects.requireNonNull(getDataFromComletableFuture(cf)).getUrl();
-    }
-
-    private String getValue(CompletableFuture<ResponseEntity<FilmResponseDto>> cf) {
-        return Objects.requireNonNull(getDataFromComletableFuture(cf)).getTitle();
-    }
-
-
     private String buildQueryUrl(String endpoint, String phrase) {
         return UriComponentsBuilder.fromUriString(endpoint).queryParam("search", phrase).toUriString();
     }
 
-    private URI buildQueryUrl(String endpoint, int page,  String phrase) {
-        return URI.create(endpoint + "?page=" + page + "&search=" + phrase);
-    }
 
     private List<URI> getNextPageUris(QueryResponse response, String endpoint, String phrase) {
         int pages = calculatePageCount(response.getResults().size(), response.getCount());
@@ -159,6 +128,10 @@ public class StarWarsService {
             nextPagesUris.add(buildQueryUrl(endpoint, i, phrase));
         }
         return nextPagesUris;
+    }
+
+    private URI buildQueryUrl(String endpoint, int page,  String phrase) {
+        return URI.create(endpoint + "?page=" + page + "&search=" + phrase);
     }
 
     private int calculatePageCount(int pageSize, int count) {
