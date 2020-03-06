@@ -32,6 +32,10 @@ public class ReportService {
         return reportRepository.save(newReport);
     }
 
+    /**
+     * throw EmptyResultDataAccessException if there is no report with given reportId
+     * @param reportId to delete
+     */
     public void delete(Long reportId) {
         reportRepository.deleteById(reportId);
     }

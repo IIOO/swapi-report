@@ -28,10 +28,10 @@ public class ApiConsumerTests {
     }
 
     @Test
-    void getResponse() {
+    void getResponseWithNextPage() {
         QueryResponse response = apiConsumer.getResponse(SEARCH_PLANETS_URL, QueryResponse.class);
 
-        assertEquals("https://swapi.co/api/planets/?page=2&search=a", response.getNext());
+        assertEquals(SEARCH_PLANETS_URL + "&page=2", response.getNext());
         assertTrue(response.getResults().size() > 0);
     }
 

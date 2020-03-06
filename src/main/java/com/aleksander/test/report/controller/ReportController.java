@@ -29,7 +29,7 @@ public class ReportController {
         Set<FilmEntryDto> films = searchService.findFilmsByCharacterAndHisHomeworld(criteriaDto);
         reportService.createOrUpdate(reportId, criteriaDto, films);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{report_id}")
@@ -41,12 +41,13 @@ public class ReportController {
     @DeleteMapping
     public ResponseEntity<?> deleteAll() {
         reportService.deleteAll();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<ReportDto>> readAll() {
-        return ResponseEntity.ok(reportService.getAll());
+        List<ReportDto> result = reportService.getAll();
+        return result.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(result);
     }
 
     @GetMapping("/{report_id}")
